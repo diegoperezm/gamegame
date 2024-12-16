@@ -1,71 +1,97 @@
+#include "raylib.h"
+#include "resource_dir.h" // utility header for SearchAndSetResourceDir
+#include <math.h>
+
+int main() {
+  const int w = 800;
+  const int h = 800;
+  const char *const title = "Hello Raylib";
+  const char *const raylib_version = RAYLIB_VERSION;
+  SearchAndSetResourceDir("resources");
+
+  SetTargetFPS(30);
+
+  SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+  InitWindow(w, h, title);
+
+  Texture2D block = LoadTexture("block.png");
+  Texture2D wabbit = LoadTexture("wabbit.png");
+  Vector2 pos = {200.0, 200.0};
+
+  float size = 45.0f;
+  float w_hex_offset = block.width;
+  float center_hex = block.width;
+  float vert_offset = (3.0 / 4.0) * block.height;
+
+  int map[5][5] = {{0, 0, 0, 0, 0},
+
+                   {0, 0, 0, 0, 0},
+                   {0, 0, 0, 0, 0},
+                   {0, 0, 0, 0, 0},
+                   {0, 0, 0, 0, 0}};
+
+  while (!WindowShouldClose()) {
+    BeginDrawing();
+    ClearBackground(BLACK);
+    for (int x = 0; x < 8; x++) {
+      for (int y = 0; y < 8; y++) {
+        int col = (y % 2 == 1) ? (x * w_hex_offset) + floor(w_hex_offset / 2.0)
+                               : x * w_hex_offset;
+
+        int row = y * vert_offset;
+        DrawTexture(wabbit, w_hex_offset, 0.0, WHITE);
+        DrawTexture(block, col, row, WHITE);
+      }
+    }
+
+    EndDrawing();
+  }
+
+  UnloadTexture(block);
+  UnloadTexture(wabbit);
+  CloseWindow();
+  return 0;
+}
 /*
+ *
 Raylib example file.
 This is an example main file for a simple raylib project.
 Use this as a starting point or replace it with your code.
 
-For a C++ project simply rename the file to .cpp and re-run the build script 
+For a C++ project simply rename the file to .cpp and re-run the build script
 
 -- Copyright (c) 2020-2024 Jeffery Myers
 --
---This software is provided "as-is", without any express or implied warranty. In no event 
---will the authors be held liable for any damages arising from the use of this software.
+--This software is provided "as-is", without any express or implied warranty.
+In no event
+--will the authors be held liable for any damages arising from the use of this
+software.
 
---Permission is granted to anyone to use this software for any purpose, including commercial 
---applications, and to alter it and redistribute it freely, subject to the following restrictions:
+--Permission is granted to anyone to use this software for any purpose,
+including commercial
+--applications, and to alter it and redistribute it freely, subject to the
+following restrictions:
 
---  1. The origin of this software must not be misrepresented; you must not claim that you 
---  wrote the original software. If you use this software in a product, an acknowledgment 
+--  1. The origin of this software must not be misrepresented; you must not
+claim that you
+--  wrote the original software. If you use this software in a product, an
+acknowledgment
 --  in the product documentation would be appreciated but is not required.
 --
---  2. Altered source versions must be plainly marked as such, and must not be misrepresented
+--  2. Altered source versions must be plainly marked as such, and must not be
+misrepresented
 --  as being the original software.
 --
 --  3. This notice may not be removed or altered from any source distribution.
 
 */
 
-#include "raylib.h"
-
-#include "resource_dir.h"	// utility header for SearchAndSetResourceDir
-
-int main ()
-{
-	// Tell the window to use vsync and work on high DPI displays
-	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
-
-	// Create the window and OpenGL context
-	InitWindow(1280, 800, "Hello Raylib");
-
-	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
-	SearchAndSetResourceDir("resources");
-
-	// Load a texture from the resources directory
-	Texture wabbit = LoadTexture("wabbit_alpha.png");
-	
-	// game loop
-	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
-	{
-		// drawing
-		BeginDrawing();
-
-		// Setup the back buffer for drawing (clear color and depth buffers)
-		ClearBackground(BLACK);
-
-		// draw some text using the default font
-		DrawText("Hello Raylib", 200,200,20,WHITE);
-
-		// draw our texture to the screen
-		DrawTexture(wabbit, 400, 200, WHITE);
-		
-		// end the frame and get ready for the next one  (display frame, poll input, etc...)
-		EndDrawing();
-	}
-
-	// cleanup
-	// unload our texture so it can be cleaned up
-	UnloadTexture(wabbit);
-
-	// destroy the window and cleanup the OpenGL context
-	CloseWindow();
-	return 0;
-}
+/*
+  int textureW = spritesheet.width;
+  int textureH = spritesheet.height;
+  int rows    = 14;
+  int columns = 20;
+  int spriteW = textureW / columns;
+  int spriteH = textureH / rows;
+  Rectangle sourceRect = {0, 0, spriteW, spriteH};
+*/
