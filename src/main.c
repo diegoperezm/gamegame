@@ -1,6 +1,11 @@
 #include "raylib.h"
 #include "resource_dir.h" // utility header for SearchAndSetResourceDir
 #include <math.h>
+#include <stdio.h>
+
+typedef enum { BLOCK, CAR } TileType;
+#define GRID_SIZE 20
+#define CELL_SIZE 45
 
 int main() {
   const int w = 800;
@@ -15,32 +20,43 @@ int main() {
   InitWindow(w, h, title);
 
   Texture2D block = LoadTexture("block.png");
-  Texture2D wabbit = LoadTexture("wabbit.png");
-  Vector2 pos = {200.0, 200.0};
+  Texture2D car = LoadTexture("car1.png");
+  Texture2D textures[] = {block, car};
 
+  Vector2 pos = {200.0, 200.0};
   float size = 45.0f;
+
   float w_hex_offset = block.width;
   float center_hex = block.width;
   float vert_offset = (3.0 / 4.0) * block.height;
 
-  int map[5][5] = {{0, 0, 0, 0, 0},
+  int map[10][10] = {{BLOCK, BLOCK, BLOCK, BLOCK, BLOCK},
+                     {BLOCK, BLOCK, BLOCK, BLOCK, BLOCK},
+                     {BLOCK, BLOCK, CAR, BLOCK, BLOCK},
+                     {BLOCK, BLOCK, BLOCK, BLOCK, BLOCK},
+                     {BLOCK, BLOCK, BLOCK, BLOCK, BLOCK}};
 
-                   {0, 0, 0, 0, 0},
-                   {0, 0, 0, 0, 0},
-                   {0, 0, 0, 0, 0},
-                   {0, 0, 0, 0, 0}};
+  size_t size_row = sizeof(map) / sizeof(map[0]);
+  size_t size_col = sizeof(map[0]) / sizeof(map[0][0]);
 
+  Camera2D camera = {0};
+  camera.offset = (Vector2){w / 2.0f, h / 2.0f};
+  camera.target = (Vector2){GRID_SIZE * size / 2.0f, GRID_SIZE * size / 2.0f};
+  camera.rotation = 0.0f;
+  camera.zoom = 1.0f;
+
+  int gW = size_col * size;
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
-    for (int x = 0; x < 8; x++) {
-      for (int y = 0; y < 8; y++) {
+    BeginMode2D(camera);
+
+    for (int x = 0; x < size_col; x++) {
+      for (int y = 0; y < size_row; y++) {
         int col = (y % 2 == 1) ? (x * w_hex_offset) + floor(w_hex_offset / 2.0)
                                : x * w_hex_offset;
-
         int row = y * vert_offset;
-        DrawTexture(wabbit, w_hex_offset, 0.0, WHITE);
-        DrawTexture(block, col, row, WHITE);
+        DrawTexture(textures[map[x][y]], col, row, WHITE);
       }
     }
 
@@ -48,12 +64,12 @@ int main() {
   }
 
   UnloadTexture(block);
-  UnloadTexture(wabbit);
+  UnloadTexture(car);
   CloseWindow();
   return 0;
 }
 /*
- *
+DrawTexture(car, car.width + col, row + floor(car.height / 2.0), WHITE);
 Raylib example file.
 This is an example main file for a simple raylib project.
 Use this as a starting point or replace it with your code.
@@ -84,14 +100,4 @@ misrepresented
 --
 --  3. This notice may not be removed or altered from any source distribution.
 
-*/
-
-/*
-  int textureW = spritesheet.width;
-  int textureH = spritesheet.height;
-  int rows    = 14;
-  int columns = 20;
-  int spriteW = textureW / columns;
-  int spriteH = textureH / rows;
-  Rectangle sourceRect = {0, 0, spriteW, spriteH};
 */
