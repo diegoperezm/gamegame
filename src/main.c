@@ -1,49 +1,14 @@
+#include "game_update.c"
 #include "raylib.h"
 #include "resource_dir.h" // utility header for SearchAndSetResourceDir
+#include "tile_textures.h"
 #include <math.h>
 #include <stdio.h>
-
-typedef enum {
-  BLOCK,
-  BLOCK_RIGHT_CORNER,
-  BLOCK_LEFT_CORNER,
-  BLOCK_TOP,
-  BLOCK_BOTTOM,
-  BLOCK_LEFT,
-  BLOCK_RIGHT,
-  BLOCK_BLANK,
-  CAR
-} TileType;
 
 #define GRID_SIZE 10
 #define CELL_SIZE 45
 
-bool GameUpdate(Camera2D *camera, Vector2 *player) {
-  float speed = 5 * GetFrameTime();
-
-  if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
-    player->y -= 10;
-    camera->target.y -= 10;
-  }
-  if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
-    player->y += 10;
-    camera->target.y += 10;
-  }
-
-  if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
-    player->x -= 10;
-    camera->target.x -= 10;
-  }
-  if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
-    player->x += 10;
-    camera->target.x += 10;
-  }
-
-  return true;
-}
-
 int main() {
-
   const float GridSize = 64;
   const int w = 1000;
   const int h = 1000;
@@ -55,29 +20,25 @@ int main() {
 
   SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
   InitWindow(w, h, title);
+  Texture2D textures[100] = {TILE_NUM};
 
-  Texture2D block = LoadTexture("block.png");
-  Texture2D block_left_corner = LoadTexture("block_left_corner.png");
-  Texture2D block_right_corner = LoadTexture("block_right_corner.png");
-  Texture2D block_top = LoadTexture("block_top.png");
-  Texture2D block_bottom = LoadTexture("block_bottom.png");
-  Texture2D block_left = LoadTexture("block_left.png");
-  Texture2D block_right = LoadTexture("block_right.png");
-  Texture2D block_blank = LoadTexture("block_blank.png");
+  const char *paths[] = {
+#define X(name, path) path,
+      TILE_LIST
+#undef X
+  };
 
-  Texture2D car = LoadTexture("car1.png");
-  Texture2D textures[] = {block,       block_right_corner, block_left_corner,
-                          block_top,   block_bottom,       block_left,
-                          block_right, block_blank,        car};
+  for (int i = 0; i < TILE_NUM; i++) {
+    textures[i] = LoadTexture(paths[i]);
+  }
+
+  Texture2D car = LoadTexture(paths[CAR]);
 
   Vector2 pos = {200.0, 200.0};
-
   Vector2 player = {200.0, 200.0};
-
   float size = 45.0f;
-
-  float w_hex_offset = block.width;
-  float vert_offset = (3.0 / 4.0) * block.height;
+  float w_hex_offset = textures[BLOCK].width;
+  float vert_offset = (3.0 / 4.0) * textures[BLOCK].height;
 
   int map[10][10] = {
       {BLOCK_LEFT_CORNER, BLOCK_TOP, BLOCK_TOP, BLOCK_TOP, BLOCK_TOP, BLOCK_TOP,
@@ -117,11 +78,8 @@ int main() {
     BeginDrawing();
     Color BLOCK_COLOR = {255, 255, 255, 255};
     ClearBackground(BLACK);
-
-    if (!GameUpdate(&camera, &player))
-      break;
-
     BeginMode2D(camera);
+    GameUpdate(&camera, &player);
 
     for (int x = 0; x < size_col; x++) {
       for (int y = 0; y < size_row; y++) {
@@ -137,8 +95,10 @@ int main() {
     EndDrawing();
   }
 
-  UnloadTexture(block);
-  UnloadTexture(car);
+  for (int i = 0; i < TILE_NUM; i++) {
+    UnloadTexture(textures[i]);
+  }
+
   CloseWindow();
   return 0;
 }
