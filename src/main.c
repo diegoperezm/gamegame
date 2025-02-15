@@ -1,26 +1,25 @@
-#include "game_update.c"
+#include "game_update.h"
 #include "raylib.h"
-#include "resource_dir.h" // utility header for SearchAndSetResourceDir
 #include "tile_textures.h"
-#include <math.h>
+// #include <math.h>
 #include <stdio.h>
 
 #define GRID_SIZE 10
 #define CELL_SIZE 45
 
 int main() {
-  const float GridSize = 64;
+  //  const float GridSize = 64;
   const int w = 1000;
   const int h = 1000;
   const char *const title = "Hello Raylib";
-  const char *const raylib_version = RAYLIB_VERSION;
-  SearchAndSetResourceDir("resources");
+  // const char *const raylib_version = RAYLIB_VERSION;
+  // SearchAndSetResourceDir("resources");
 
   SetTargetFPS(30);
 
   SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
   InitWindow(w, h, title);
-  Texture2D textures[100] = {TILE_NUM};
+  Texture2D textures[100] = {{TILE_NUM}};
 
   const char *paths[] = {
 #define X(name, path) path,
@@ -34,11 +33,11 @@ int main() {
 
   Texture2D car = LoadTexture(paths[CAR]);
 
-  Vector2 pos = {200.0, 200.0};
+  // Vector2 pos = {200.0, 200.0};
   Vector2 player = {200.0, 200.0};
-  float size = 45.0f;
-  float w_hex_offset = textures[BLOCK].width;
-  float vert_offset = (3.0 / 4.0) * textures[BLOCK].height;
+  //  float size = 45.0f;
+  int w_hex_offset = textures[BLOCK].width;
+  int vert_offset = 3 / 4 * textures[BLOCK].height;
 
   int map[10][10] = {
       {BLOCK_LEFT_CORNER, BLOCK_TOP, BLOCK_TOP, BLOCK_TOP, BLOCK_TOP, BLOCK_TOP,
@@ -64,8 +63,8 @@ int main() {
 
   };
 
-  size_t size_row = sizeof(map) / sizeof(map[0]);
-  size_t size_col = sizeof(map[0]) / sizeof(map[0][0]);
+  int size_row = sizeof(map) / sizeof(map[0]);
+  int size_col = sizeof(map[0]) / sizeof(map[0][0]);
 
   Camera2D camera = {0};
   camera.offset = (Vector2){w / 2.0f, h / 2.0f};
@@ -73,21 +72,24 @@ int main() {
   camera.zoom = 1.0f;
   camera.target = (Vector2){player.x + 2.0f, player.y + 2.0f};
 
-  int gW = size_col * size;
+  //  int gW = size_col * size;
   while (!WindowShouldClose()) {
     BeginDrawing();
-    Color BLOCK_COLOR = {255, 255, 255, 255};
+    Color BLOCK_COLOR = {0, 255, 0, 255};
+
     ClearBackground(BLACK);
     BeginMode2D(camera);
     GameUpdate(&camera, &player);
 
     for (int x = 0; x < size_col; x++) {
       for (int y = 0; y < size_row; y++) {
-        int col = (y % 2 == 1) ? (x * w_hex_offset) + floor(w_hex_offset / 2.0)
+        int col = (y % 2 == 1) ? (x * w_hex_offset) + (w_hex_offset / 2)
                                : x * w_hex_offset;
+
         int row = y * vert_offset;
+
         DrawTexture(textures[map[y][x]], col, row, BLOCK_COLOR);
-        DrawTexture(car, player.x, player.y, BLOCK_COLOR);
+        DrawTexture(car, (int)player.x, (int)player.y, BLOCK_COLOR);
       }
     }
 

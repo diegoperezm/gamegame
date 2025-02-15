@@ -2,7 +2,7 @@
 #include "raylib.h"
 
 void GameUpdate(Camera2D *camera, Vector2 *player) {
-  float speed = 5 * GetFrameTime();
+  // float speed = 5 * GetFrameTime();
 
   if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
     player->y -= 10;
